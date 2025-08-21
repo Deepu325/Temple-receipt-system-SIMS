@@ -11,11 +11,13 @@
   "build": {
     "appId": "com.sims.trs",
     "productName": "SIMS TRS",
-    "publish": [{
-      "provider": "github",
-      "owner": "YOUR_GITHUB_USERNAME",
-      "repo": "sims-trs"
-    }],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Deepu325",
+        "repo": "Temple-receipt-system-SIMS"
+      }
+    ],
     "win": {
       "target": [
         "nsis"
