@@ -1,0 +1,223 @@
+  <head>
+    <meta charset="UTF-8">
+    <title>Receipt History</title>
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/receipt-history.css">
+  </head>
+  <div class="header">
+    <img src="../assets/temple logo.png" alt="Temple Logo" class="logo">
+    <h1 class="kannada">ಶ್ರೀ ಸೌಂದರ್ಯ ವೆಂಕಟರಮಣ ಸ್ವಾಮಿ ದೇವಸ್ಥಾನ</h1>
+  </div>
+  <nav class="nav" id="mainNav"></nav>
+  <script>
+    // Role-based nav and access control
+    const role = localStorage.getItem('role');
+    if (!role) {
+      window.location.replace('login.html');
+    }
+    const nav = document.getElementById('mainNav');
+    if (nav) {
+      let links = [
+        { href: 'index.html', label: 'Home' },
+        { href: 'create-receipt.html', label: 'Create Receipt' },
+        { href: 'manage-poojas.html', label: 'Manage Poojas' },
+        { href: 'receipt-history.html', label: 'Receipt History' },
+        { href: 'backup.html', label: 'Backup' }
+      ];
+      if (role === 'staff') {
+        links = links.filter(l => l.href === 'index.html' || l.href === 'create-receipt.html' || l.href === 'receipt-history.html');
+      }
+  links.push({ href: '#', label: 'Logout', id: 'logoutLink' });
+  nav.innerHTML = links.map(l => `<a href="${l.href}"${l.id ? ` id="${l.id}"` : ''}>${l.label}</a>`).join('');
+      // Logout handler
+      const logout = document.getElementById('logoutLink');
+      if (logout) {
+        logout.onclick = (e) => {
+          e.preventDefault();
+          localStorage.clear();
+          window.location.replace('login.html');
+        };
+      }
+      // Highlight active nav link
+      const navLinks = nav.querySelectorAll('a');
+      navLinks.forEach(link => {
+        if (location.pathname.endsWith(link.getAttribute('href'))) {
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
+        }
+      });
+    }
+    // Hide action buttons for staff
+    window.addEventListener('DOMContentLoaded', () => {
+      if (role === 'staff') {
+        // Hide manage-poojas and backup buttons
+        const manageBtn = document.querySelector('a[href="manage-poojas.html"]');
+        if (manageBtn) manageBtn.style.display = 'none';
+        const backupBtn = document.querySelector('a[href="backup.html"]');
+        if (backupBtn) backupBtn.style.display = 'none';
+      }
+    });
+  </script>
+  <h2>Receipt History</h2>
+  <form id="filterForm" class="card-form" style="max-width:600px;">
+    <div style="display:flex;gap:2em;align-items:end;justify-content:center;">
+      <div>
+        <label for="from">From</label>
+        <input name="from" id="from" type="date" style="padding:0.4em 0.8em;border:1px solid #bfc7d1;border-radius:6px;font-size:1em;background:#f8fafc;transition:border 0.2s,box-shadow 0.2s;">
+      </div>
+      <div>
+        <label for="to">To</label>
+        <input name="to" id="to" type="date" style="padding:0.4em 0.8em;border:1px solid #bfc7d1;border-radius:6px;font-size:1em;background:#f8fafc;transition:border 0.2s,box-shadow 0.2s;">
+      </div>
+      <div class="form-actions" style="margin-bottom:0;">
+        <button type="submit" style="background:linear-gradient(90deg,#3b82f6 60%,#2563eb 100%);color:#fff;border:none;border-radius:6px;padding:0.6em 1.6em;font-size:1.05em;font-weight:600;cursor:pointer;box-shadow:0 2px 8px #3b82f622;transition:background 0.2s,box-shadow 0.2s,transform 0.1s;">Filter</button>
+      </div>
+    </div>
+  </form>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Receipt No</th><th>Date</th><th>Name</th><th>Address</th><th>Pooja</th><th>Amount</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="receiptsTable"></tbody>
+    </table>
+  </div>
+  <div class="table-actions">
+    <div id="pagination"></div>
+    <button id="exportBtn" type="button">Export Filtered to PDF</button>
+    </div>
+    <div id="result"></div>
+  <!-- Button group is rendered dynamically in JS for each row -->
+    <style>
+      .button-group {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        align-items: center;
+      }
+      .receipt-action-btn {
+        background: #1976d2;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 18px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      }
+      .receipt-action-btn.delete {
+        background: #d32f2f;
+      }
+      .receipt-action-btn:focus {
+        outline: 2px solid #1976d2;
+      }
+      .receipt-action-btn:hover {
+        background: #1565c0;
+      }
+      .receipt-action-btn.delete:hover {
+        background: #b71c1c;
+      }
+    </style>
+  </main>
+  <script>
+    let allReceipts = [];
+    let currentPage = 1;
+    const pageSize = 20;
+    let currentFilters = {};
+    function renderTable() {
+      const tb = document.getElementById('receiptsTable');
+      tb.innerHTML = '';
+      const start = (currentPage-1)*pageSize;
+      const pageRows = allReceipts.slice(start, start+pageSize);
+      const role = localStorage.getItem('role');
+      pageRows.forEach(row => {
+        const tr = document.createElement('tr');
+        let actions = `<div class='button-group'>`;
+        actions += `<button onclick="reprint(${row.id})" class="receipt-action-btn">Reprint</button>`;
+        if (role !== 'staff') {
+          actions += `<button onclick="del(${row.id})" class="receipt-action-btn delete">Delete</button>`;
+        }
+        actions += `</div>`;
+        tr.innerHTML = `<td>${row.id}</td><td>${row.date}</td><td>${row.devotee_name}</td><td>${row.address}</td><td>${row.pooja_name}</td><td>${row.amount}</td><td>${actions}</td>`;
+        tb.appendChild(tr);
+      });
+      renderPagination();
+    }
+    function renderPagination() {
+      const total = allReceipts.length;
+      const pages = Math.ceil(total/pageSize);
+      const pagDiv = document.getElementById('pagination');
+      pagDiv.innerHTML = '';
+      if (pages <= 1) return;
+      for (let i=1; i<=pages; ++i) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = (i===currentPage) ? 'primary' : 'secondary';
+        btn.onclick = () => { currentPage = i; renderTable(); };
+        pagDiv.appendChild(btn);
+      }
+    }
+    async function load(filters={}) {
+      currentFilters = filters;
+      currentPage = 1;
+      const r = await window.electronAPI.getReceipts(filters);
+      if (r.success && r.receipts) {
+        allReceipts = r.receipts;
+      } else {
+        allReceipts = [];
+      }
+      renderTable();
+    }
+    load();
+    document.getElementById('filterForm').onsubmit = e => {
+      e.preventDefault();
+      const fromInput = document.getElementById('from');
+      const toInput = document.getElementById('to');
+      const filters = {};
+      if (fromInput.value) filters.from = fromInput.value;
+      if (toInput.value) filters.to = toInput.value;
+      load(filters);
+    };
+    window.reprint = async (id) => {
+      await window.electronAPI.printReceipt(id);
+      document.getElementById('result').textContent = 'Printing...';
+    };
+    // Listen for print-pdf-buffer and print using a hidden iframe
+    window.electronAPI.onPrintPdfBuffer((pdfBuffer) => {
+      const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      let iframe = document.getElementById('pdfPrintFrame');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'pdfPrintFrame';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+      iframe.src = url;
+      iframe.onload = () => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      };
+    });
+    window.del = async (id) => {
+      if (confirm('Delete this receipt?')) {
+        const res = await window.electronAPI.deleteReceipt(id);
+        if (res.success) {
+          document.getElementById('result').textContent = 'Receipt deleted.';
+          load(currentFilters);
+        } else {
+          document.getElementById('result').textContent = res.error || 'Delete failed.';
+        }
+      }
+    };
+    document.getElementById('exportBtn').onclick = async () => {
+      const res = await window.electronAPI.generateBackupPDF(currentFilters);
+      document.getElementById('result').textContent = res.success ? 'Exported PDF: ' + res.pdfPath : res.error;
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+@font-face {
+  font-family: 'Noto Sans Kannada';
+  src: url('../fonts/NotoSansKannada-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.receipt-kannada {
+  font-family: 'Noto Sans Kannada', sans-serif;
+  background: #fff;
+  color: #222;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+.receipt-header {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-bottom: 0.2em;
+}
+.receipt-address {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1em;
+  margin-bottom: 0.5em;
+}
+
+.receipt-details {
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  padding: 1em 1.2em;
+  margin-bottom: 1em;
+  background: #fafbfc;
+}
+.receipt-details-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.4em;
+  font-size: 1em;
+}
+.receipt-details-row:last-child {
+  margin-bottom: 0;
+}
+
+.receipt-thankyou {
+  text-align: center;
+  margin-top: 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+}
+
+@media print {
+  body, html {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  .receipt-kannada {
+    box-shadow: none !important;
+    margin: 0 auto !important;
+    page-break-after: avoid;
+  }
+}

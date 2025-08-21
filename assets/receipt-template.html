@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Receipt</title>
+<style>
+    @font-face {
+        font-family: 'NotoSansKannada';
+        src: url('NotoSansKannada-Regular.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: block;
+    }
+
+    * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        font-family: 'NotoSansKannada', 'Tunga', 'Nirmala UI', system-ui, -apple-system, sans-serif;
+        font-weight: bold;
+    }
+
+    .kannada-text {
+        font-family: 'NotoSansKannada', 'Tunga', 'Nirmala UI', system-ui, -apple-system, sans-serif;
+        font-feature-settings: "kern" 1;
+        text-rendering: optimizeLegibility;
+        font-weight: bold;
+    }
+
+    /* fixed: single @page rule, no browser margin */
+    @page { 
+        size: A5 landscape;
+        margin: 0;
+        marks: none;
+    }
+    @media print {
+        html, body {
+            width: 210mm;
+            height: 148mm;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .receipt-container {
+            page-break-inside: avoid;
+            page-break-after: avoid;
+            page-break-before: avoid;
+        }
+    }
+
+    /* Base reset and fixed A5 landscape size */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { 
+        width: 210mm; 
+        height: 148mm; 
+        margin: 0 auto; 
+        padding: 0;
+        overflow: hidden;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* wrapper with fixed dimensions */
+    .page-wrapper {
+        box-sizing: border-box;
+        width: 210mm;
+        height: 148mm;
+        padding: 4mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+        margin: 0 auto;
+    }
+
+    /* Receipt fixed design size for A5 paper */
+    .receipt-container {
+        width: 200mm; /* 210mm - 2 * 5mm margin */
+        height: 142mm; /* maximize height */
+        padding: 2mm 1em 4mm 1em;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2mm;
+        background: white;
+        font-size: 1.32em;
+        position: relative;
+        overflow: hidden;
+        page-break-inside: avoid;
+        page-break-after: avoid;
+        border: 3px solid #000;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+
+    /* Enhanced header layout */
+    .header-row { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        padding: 0.2em 1.4em; 
+        margin-bottom: 0.3em; 
+    }
+    .circle-img { 
+        width: 58px; 
+        height: 58px; 
+        border: none; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .circle-img img, .circle-img svg { 
+        width: 52px; 
+        height: 52px; 
+        object-fit: contain; 
+        min-width: 52px; 
+        display: block;
+        filter: contrast(1.05);
+    }
+    .center-img { 
+        width: 120px; 
+        height: 58px; 
+        border: none; 
+        border-radius: 0; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        background: #fff;
+    }
+    .center-img img { 
+        width: 120px; 
+        height: 54px; 
+        object-fit: contain; 
+        min-width: 120px; 
+        display: block; 
+        border: none; 
+        border-radius: 0;
+        filter: contrast(1.05);
+    }
+    .temple-title { font-size:1.4em; font-weight:bold; text-align:center; margin:0.02em 0; letter-spacing:0; font-family:'Noto Sans Kannada', sans-serif; white-space: nowrap; }
+    .temple-address { font-size:0.95em; text-align:center; margin:0.02em 0 0.05em 0; font-family:'Noto Sans Kannada', sans-serif; line-height:1.1; font-weight:bold; }
+    .main-section { 
+        flex:1 1 auto; 
+        margin:0 0 1em 0; 
+        padding:0; 
+        display:flex; 
+        align-items:stretch;
+        min-height: 0;
+    }
+    .main-section table { 
+        width:100%; 
+        border-collapse:separate; 
+        border-spacing:0; 
+    }
+    .main-section > table { 
+        border: 2px solid #333; 
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .main-section > table > tr > td { 
+        padding: 0.4em 0.8em; 
+        vertical-align: top; 
+        background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent);
+    }
+    .main-section > table > tr > td:first-child { 
+        width:62%; 
+        border-right:1.8px solid #333; 
+        padding-right:0.6em; 
+    }
+    .main-section > table > tr > td:last-child { 
+        width:38%; 
+        padding-left:0.5em; 
+    }
+    .details-table { width:100%; margin:0; }
+    .details-table td { padding:0.12em 0; font-size:1.1em; font-family:'Noto Sans Kannada', sans-serif; }
+    .details-table td:first-child {
+        font-weight: bold;
+        width: 38%;
+        padding: 0.15em 0.3em;
+        padding-left: 0.2cm;
+        white-space: nowrap;
+        color: #000;
+        font-size: 1.05em;
+    }
+    .details-table td:last-child { 
+        border-bottom: 2px dotted #333; 
+        padding: 0.15em 0.3em;
+        min-height: 1.3em;
+        position: relative;
+        font-weight: bold;
+        color: #000;
+    }
+    /* Auto-scaling text for pooja names */
+    .details-table tr:nth-child(5) td:last-child,
+    .details-table tr:nth-child(6) td:last-child {
+        font-size: 0.95em; /* default size */
+    }
+    /* Apply smaller font size when text is long */
+    .details-table tr:nth-child(5) td:last-child span,
+    .details-table tr:nth-child(6) td:last-child span {
+        display: inline-block;
+        max-width: 100%;
+        white-space: nowrap;
+    }
+    /* Medium length pooja names */
+    .details-table tr:nth-child(5) td:last-child span[data-length="medium"],
+    .details-table tr:nth-child(6) td:last-child span[data-length="medium"] {
+        font-size: 0.85em;
+    }
+    /* Long pooja names */
+    .details-table tr:nth-child(5) td:last-child span[data-length="long"],
+    .details-table tr:nth-child(6) td:last-child span[data-length="long"] {
+        font-size: 0.75em;
+    }
+    .amount-table { height:100%; width:100%; border-collapse:separate; border-spacing:0; }
+    .amount-table td { 
+        text-align:center; 
+        padding:0.3em;
+        font-family: 'NotoSansKannada', 'Tunga', 'Nirmala UI', system-ui, -apple-system, sans-serif;
+    }
+    .amount-table strong {
+        font-family: 'NotoSansKannada', 'Tunga', 'Nirmala UI', system-ui, -apple-system, sans-serif;
+        font-feature-settings: "kern" 1;
+        text-rendering: optimizeLegibility;
+    }
+    .amount-value { 
+        font-size: 2em; 
+        font-weight: bold; 
+        padding: 0.25em 0; 
+        border-bottom: 2.5px dotted #333; 
+        margin: 0.15em 0;
+        font-family: 'NotoSansKannada', 'Tunga', 'Nirmala UI', system-ui, -apple-system, sans-serif;
+        text-shadow: 0.3px 0.3px 0px rgba(0,0,0,0.15);
+        letter-spacing: 0.02em;
+    }
+    .amount-words { 
+        font-size: 1.15em; 
+        color: #000; 
+        padding: 0.3em 0; 
+        border-bottom: 2px dotted #333;
+        font-family: 'NotoSansKannada', 'Tunga', 'Nirmala UI', system-ui, -apple-system, sans-serif;
+        font-weight: bold;
+        letter-spacing: 0.01em;
+    }
+    .footer {
+        font-size: 0.88em;
+        font-weight: 600;
+        text-align: center;
+        width: 100%;
+        font-family: 'Noto Sans Kannada', sans-serif;
+        line-height: 1.2;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        position: absolute;
+        bottom: 1.8mm;
+        left: 0;
+        right: 0;
+        color: #000;
+        white-space: nowrap;
+        transform: scale(0.95);
+        transform-origin: center bottom;
+        z-index: 1;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+</style>
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+    <div class="receipt-container" id="receiptContainer">
+        <div class="header-row">
+            <div class="circle-img left"><img src="temple logo.png" alt="Temple Logo" /></div>
+            <div class="center-img"><img src="symbols.png" alt="Temple Symbol" /></div>
+            <div class="circle-img right"><img src="SET logo.png" alt="SET Logo" /></div>
+        </div>
+    <div class="temple-title">ಶ್ರೀ ಸೌಂದರ್ಯ ವೆಂಕಟರಮಣ ಸ್ವಾಮಿ ದೇವಸ್ಥಾನ</div>
+    <div class="temple-address">೧೨ನೇ ಅಡ್ಡ ರಸ್ತೆ, ೧ನೇ ಮುಖ್ಯ ರಸ್ತೆ, ಸೌಂದರ್ಯ ನಗರ, ಸಿಡೆದಹಳ್ಳಿ,<br>
+ನಾಗಸಂದ್ರ ಅಂಚೆ, ಬೆಂಗಳೂರು</div>
+    <div class="main-section">
+        <table>
+            <tr>
+                <td style="width:60%; border-right:2px solid #222;">
+                    <table class="details-table">
+                        <tr><td>ರಸೀದಿ ಸಂಖ್ಯೆ:</td><td><span id="receiptNo"></span></td></tr>
+                        <tr><td>ದಿನಾಂಕ:</td><td><span id="date"></span></td></tr>
+                        <tr><td>ಹೆಸರು:</td><td><span id="name"></span></td></tr>
+                        <tr><td>ವಿಳಾಸ:</td><td><span id="address"></span></td></tr>
+                        <tr><td>ಪೂಜೆ/ಸೇವೆ 1:</td><td><span id="pooja1"></span></td></tr>
+                        <tr class="pooja2-row" style="display: none;"><td>ಪೂಜೆ/ಸೇವೆ 2:</td><td><span id="pooja2"></span></td></tr>
+                        <tr><td>ಪಾವತಿ ವಿಧಾನ:</td><td><span id="paymentMode"></span></td></tr>
+                    </table>
+                </td>
+                <td style="width:40%;">
+                    <table class="amount-table">
+                        <tr><td style="font-family: NotoSansKannada"><strong>ಮೊತ್ತ</strong></td></tr>
+                        <tr><td class="amount-value" style="font-family: NotoSansKannada">₹ <span id="amount"></span></td></tr>
+                        <tr><td class="amount-words" style="font-family: NotoSansKannada"><span id="amountWords"></span></td></tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="footer">ನಿಮ್ಮ ಜೀವನದಲ್ಲಿ ಶ್ರೀ ಸೌಂದರ್ಯ ವೆಂಕಟರಮಣ ಸ್ವಾಮಿಯ ಆಶೀರ್ವಾದ ಸದಾ ಇರಲಿ.</div>
+    </div>
+</div>
+
+<script>
+// Fixed scale without any console output or event debugging
+const container = document.getElementById('receiptContainer');
+if (container) {
+    container.style.transform = 'scale(0.95)';
+    container.style.transformOrigin = 'top center';
+}
+</script>
+
+</body>
+</html>

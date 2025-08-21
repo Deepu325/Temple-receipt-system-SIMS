@@ -1,0 +1,203 @@
+  <div class="header">
+    <img src="../assets/temple logo.png" alt="Temple Logo" class="logo">
+    <h1 class="kannada">ಶ್ರೀ ಸೌಂದರ್ಯ ವೆಂಕಟರಮಣ ಸ್ವಾಮಿ ದೇವಸ್ಥಾನ</h1>
+  </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="../css/header.css">
+  <link rel="stylesheet" href="../css/manage-poojas.css">
+  <style>
+    .button-group {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      align-items: center;
+    }
+    .pooja-action-btn {
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+    .pooja-action-btn.delete {
+      background: #d32f2f;
+    }
+    .pooja-action-btn:focus {
+      outline: 2px solid #1976d2;
+    }
+    .pooja-action-btn:hover {
+      background: #1565c0;
+    }
+    .pooja-action-btn.delete:hover {
+      background: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header and logo removed as requested -->
+  <nav class="nav" id="mainNav"></nav>
+  <main>
+  <!-- Removed duplicate nav script to avoid redeclaration error -->
+  <h2>Manage Poojas</h2>
+  <form id="addPoojaForm" class="card-form">
+    <label for="poojaName">Name</label>
+    <input name="name" id="poojaName" required>
+    <label for="poojaPrice">Price</label>
+    <input name="price" id="poojaPrice" type="number" required>
+    <div class="form-actions">
+      <button type="submit" class="pooja-action-btn add">Add</button>
+    </div>
+  <style>
+    .pooja-action-btn.add {
+      background: linear-gradient(90deg,#3b82f6 60%,#2563eb 100%);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6em 1.6em;
+      font-size: 1.05em;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #3b82f622;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+    .pooja-action-btn.add:focus {
+      outline: 2px solid #2563eb;
+    }
+    .pooja-action-btn.add:hover {
+      background: linear-gradient(90deg,#2563eb 60%,#1d4ed8 100%);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 4px 16px #2563eb33;
+    }
+  </style>
+  </form>
+  <ul id="poojaList" class="pooja-list"></ul>
+  <div id="result"></div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#0008; align-items:center; justify-content:center; z-index:1000;">
+    <div style="background:#fff; padding:2em 2.5em; border-radius:10px; min-width:280px; max-width:90vw; box-shadow:0 2px 16px #0002; display:flex; flex-direction:column; gap:1em; align-items:center;">
+      <h3>Edit Pooja</h3>
+      <input id="editName" type="text" style="width:100%; padding:0.5em; font-size:1em;" placeholder="Name">
+      <input id="editPrice" type="number" style="width:100%; padding:0.5em; font-size:1em;" placeholder="Price">
+      <div style="display:flex; gap:1em;">
+        <button id="saveEditBtn" class="pooja-action-btn">Save</button>
+        <button id="cancelEditBtn" class="pooja-action-btn delete">Cancel</button>
+      </div>
+    </div>
+  </div>
+  </main>
+</main>
+<script>
+
+// Role-based nav and access control
+const role = localStorage.getItem('role');
+if (!role) {
+  window.location.replace('login.html');
+}
+const nav = document.getElementById('mainNav');
+if (nav) {
+  let links = [
+    { href: 'index.html', label: 'Home' },
+    { href: 'create-receipt.html', label: 'Create Receipt' },
+    { href: 'manage-poojas.html', label: 'Manage Poojas' },
+    { href: 'receipt-history.html', label: 'Receipt History' },
+    { href: 'backup.html', label: 'Backup' }
+  ];
+  if (role === 'staff') {
+    links = links.filter(l => l.href === 'index.html' || l.href === 'create-receipt.html' || l.href === 'receipt-history.html');
+  }
+  links.push({ href: '#', label: 'Logout', id: 'logoutLink' });
+  nav.innerHTML = links.map(l => `<a href="${l.href}"${l.id ? ` id="${l.id}"` : ''}>${l.label}</a>`).join('');
+  // Logout handler
+  const logout = document.getElementById('logoutLink');
+  if (logout) {
+    logout.onclick = (e) => {
+      e.preventDefault();
+      localStorage.clear();
+      window.location.replace('login.html');
+    };
+  }
+  // Highlight active nav link
+  const navLinks = nav.querySelectorAll('a');
+  navLinks.forEach(link => {
+    if (location.pathname.endsWith(link.getAttribute('href'))) {
+      link.classList.add('active');
+      link.setAttribute('aria-current', 'page');
+    }
+  });
+}
+// Hide action buttons for staff
+window.addEventListener('DOMContentLoaded', () => {
+  if (role === 'staff') {
+    // Hide manage-poojas and backup buttons
+    const manageBtn = document.querySelector('a[href="manage-poojas.html"]');
+    if (manageBtn) manageBtn.style.display = 'none';
+    const backupBtn = document.querySelector('a[href="backup.html"]');
+    if (backupBtn) backupBtn.style.display = 'none';
+  }
+});
+
+let editPoojaId = null;
+function refresh() {
+  window.electronAPI.getPoojas().then(r => {
+    const ul = document.getElementById('poojaList');
+    ul.innerHTML = '';
+    if (r.success && r.poojas) {
+      r.poojas.forEach(p => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>${p.name} (₹${p.price})</span>
+          <div class='button-group'>
+            <button onclick="edit(${p.id}, '${p.name.replace(/'/g, "&#39;")}', ${p.price})" class="pooja-action-btn">Edit</button>
+            <button onclick="del(${p.id})" class="pooja-action-btn delete">Delete</button>
+          </div>
+        `;
+        ul.appendChild(li);
+      });
+    }
+  });
+}
+refresh();
+document.getElementById('addPoojaForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+  const res = await window.electronAPI.addPooja(data.name, data.price);
+  document.getElementById('result').textContent = res.success ? 'Added.' : res.error;
+  refresh();
+};
+window.edit = (id, name, price) => {
+  editPoojaId = id;
+  document.getElementById('editName').value = name;
+  document.getElementById('editPrice').value = price;
+  document.getElementById('editModal').style.display = 'flex';
+};
+window.del = (id) => {
+  if (confirm('Delete this pooja?')) {
+    window.electronAPI.deletePooja(id).then(refresh);
+  }
+};
+document.getElementById('saveEditBtn').onclick = async () => {
+  const newName = document.getElementById('editName').value.trim();
+  const newPrice = document.getElementById('editPrice').value.trim();
+  if (!newName || !newPrice || isNaN(newPrice)) {
+    document.getElementById('result').textContent = 'Enter valid name and price.';
+    return;
+  }
+  const res = await window.electronAPI.editPooja(Number(editPoojaId), newName, Number(newPrice));
+  document.getElementById('result').textContent = res.success ? 'Updated.' : (res.error || 'Update failed.');
+  document.getElementById('editModal').style.display = 'none';
+  refresh();
+};
+document.getElementById('cancelEditBtn').onclick = () => {
+  document.getElementById('editModal').style.display = 'none';
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+{
+  "name": "electron-offline-app",
+  "version": "1.0.0",
+  "description": "Electron.js offline desktop app skeleton",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.sims.trs",
+    "productName": "SIMS TRS",
+    "publish": [{
+      "provider": "github",
+      "owner": "YOUR_GITHUB_USERNAME",
+      "repo": "sims-trs"
+    }],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/temple logo.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "SIMS TRS"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "src/**/*",
+      "css/**/*",
+      "js/**/*",
+      "db/**/*",
+      "assets/**/*",
+      "fonts/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist"
+    },
+    "extraResources": [
+      {
+        "from": "db/",
+        "to": "db",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "fonts/",
+        "to": "fonts",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "^24.13.3",
+    "electron-rebuild": "^3.2.9",
+    "electron-updater": "^6.6.2"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.2.0",
+    "pdfkit": "^0.17.1",
+    "puppeteer": "^24.16.2"
+  }
+}

@@ -1,0 +1,387 @@
+  <head>
+    <meta charset="UTF-8">
+    <title>Create Receipt</title>
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/create-receipt.css">
+  </head>
+  <div class="header">
+    <img src="../assets/temple logo.png" alt="Temple Logo" class="logo">
+    <h1 class="kannada">ಶ್ರೀ ಸೌಂದರ್ಯ ವೆಂಕಟರಮಣ ಸ್ವಾಮಿ ದೇವಸ್ಥಾನ</h1>
+  </div>
+  <nav class="nav" id="mainNav"></nav>
+  <main>
+  <script>
+    // Role-based nav and access control
+    const role = localStorage.getItem('role');
+    if (!role) {
+      window.location.replace('login.html');
+    }
+    const nav = document.getElementById('mainNav');
+    if (nav) {
+      let links = [
+        { href: 'index.html', label: 'Home' },
+        { href: 'create-receipt.html', label: 'Create Receipt' },
+        { href: 'manage-poojas.html', label: 'Manage Poojas' },
+        { href: 'receipt-history.html', label: 'Receipt History' },
+        { href: 'backup.html', label: 'Backup' }
+      ];
+      if (role === 'staff') {
+        links = links.filter(l => l.href === 'index.html' || l.href === 'create-receipt.html' || l.href === 'receipt-history.html');
+      }
+      links.push({ href: '#', label: 'Logout', id: 'logoutLink' });
+      nav.innerHTML = links.map(l => `<a href="${l.href}"${l.id ? ` id="${l.id}"` : ''}>${l.label}</a>`).join('');
+    
+      nav.innerHTML = links.map(l => `<a href="${l.href}">${l.label}</a>`).join('');
+      // Highlight active nav link
+      const navLinks = nav.querySelectorAll('a');
+      navLinks.forEach(link => {
+        if (location.pathname.endsWith(link.getAttribute('href'))) {
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
+        }
+      });
+    }
+    // Hide action buttons for staff
+    window.addEventListener('DOMContentLoaded', () => {
+      if (role === 'staff') {
+        // Hide manage-poojas and backup buttons
+        const manageBtn = document.querySelector('a[href="manage-poojas.html"]');
+        if (manageBtn) manageBtn.style.display = 'none';
+        const backupBtn = document.querySelector('a[href="backup.html"]');
+        if (backupBtn) backupBtn.style.display = 'none';
+      }
+    });
+    
+      // Logout handler
+      const logout = document.getElementById('logoutLink');
+      if (logout) {
+        logout.onclick = (e) => {
+          e.preventDefault();
+          localStorage.clear();
+          window.location.replace('login.html');
+        };
+      }
+  </script>
+  <h2>Create Receipt</h2>
+  <form id="receiptForm" autocomplete="off" class="card-form">
+    <label for="devotee_name">Devotee Name</label>
+    <input name="devotee_name" id="devotee_name" required>
+    <label for="address">Address</label>
+    <input name="address" id="address">
+    <div class="pooja-section">
+      <div class="pooja-row">
+        <label for="pooja1">Pooja 1</label>
+        <select name="pooja1" id="poojaSelect1" required class="pooja-select"></select>
+      </div>
+      <div class="pooja-row" id="pooja2Row" style="display: none;">
+        <label for="pooja2">Pooja 2</label>
+        <select name="pooja2" id="poojaSelect2" class="pooja-select"></select>
+        <button type="button" id="removePooja2" class="remove-pooja">✕</button>
+      </div>
+      <button type="button" id="addPoojaBtn" class="add-pooja">+ Add Another Pooja</button>
+    </div>
+    <label for="amount">Total Amount</label>
+    <input name="amount" id="amount" type="number" required readonly>
+    
+    <style>
+      .pooja-section {
+        margin-bottom: 1em;
+      }
+      .pooja-row {
+        display: flex;
+        align-items: center;
+        gap: 1em;
+        margin-bottom: 0.5em;
+      }
+      .pooja-select {
+        flex: 1;
+      }
+      .add-pooja {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 0.5em;
+      }
+      .remove-pooja {
+        background: #ff5252;
+        color: white;
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .add-pooja:hover {
+        background: #45a049;
+      }
+      .remove-pooja:hover {
+        background: #ff1744;
+      }
+    </style>
+    <label for="payment_mode">Payment Mode</label>
+    <select name="payment_mode" id="payment_mode" required>
+      <option value="Cash">Cash</option>
+      <option value="Online">Online</option>
+    </select>
+    <div class="form-actions">
+  <button type="submit" class="receipt-action-btn primary">Save & Print</button>
+  <button type="button" id="clearBtn" class="receipt-action-btn">Clear Form</button>
+  <button type="button" id="previewBtn" class="receipt-action-btn">Preview Receipt</button>
+  <style>
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 1em;
+      border-radius: 12px;
+      position: relative;
+      width: 800px;
+      min-height: 500px;
+      max-height: 90vh;
+      overflow: auto;
+    }
+    .close {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: #666;
+    }
+    .preview-actions {
+      text-align: center;
+      margin-top: 1.5em;
+      padding: 1em;
+      border-top: 1px solid #eee;
+    }
+    .receipt-action-btn {
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6em 1.6em;
+      font-size: 1.05em;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #3b82f622;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+    .receipt-action-btn.primary {
+      background: linear-gradient(90deg,#3b82f6 60%,#2563eb 100%);
+    }
+    .receipt-action-btn:focus {
+      outline: 2px solid #2563eb;
+    }
+    .receipt-action-btn:hover {
+      background: #1565c0;
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 4px 16px #2563eb33;
+    }
+    .receipt-action-btn.primary:hover {
+      background: linear-gradient(90deg,#2563eb 60%,#1d4ed8 100%);
+    }
+  </style>
+    </div>
+  </form>
+  <div id="result"></div>
+  <div id="previewModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <button id="closePreview" class="close">&times;</button>
+      <div id="previewContent"></div>
+      <div class="preview-actions">
+        <button id="backFromPreview" class="receipt-action-btn">Back</button>
+      </div>
+    </div>
+  </div>
+  </main>
+  <script>
+    let poojaList = [];
+    let nextReceiptNo = '';
+    
+    // Function to convert number to words
+    function amountInWords(number) {
+      const single = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+        'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+      const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+      
+      if (!number) return '';
+      
+      number = parseInt(number);
+      if (number === 0) return 'Zero Rupees Only';
+      
+      function convert(n) {
+        if (n < 20) return single[n];
+        if (n < 100) return tens[Math.floor(n/10)] + (n%10 ? ' ' + single[n%10] : '');
+        if (n < 1000) return single[Math.floor(n/100)] + ' Hundred' + (n%100 ? ' and ' + convert(n%100) : '');
+        if (n < 100000) return convert(Math.floor(n/1000)) + ' Thousand' + (n%1000 ? ' ' + convert(n%1000) : '');
+        if (n < 10000000) return convert(Math.floor(n/100000)) + ' Lakh' + (n%100000 ? ' ' + convert(n%100000) : '');
+        return convert(Math.floor(n/10000000)) + ' Crore' + (n%10000000 ? ' ' + convert(n%10000000) : '');
+      }
+      
+      return convert(number) + ' Rupees Only';
+    }
+    // Populate pooja dropdowns and set up amount autofill
+    async function loadPoojas() {
+      const r = await window.electronAPI.getPoojas();
+      if (r.success && r.poojas) {
+        poojaList = r.poojas;
+        const sel1 = document.getElementById('poojaSelect1');
+        const sel2 = document.getElementById('poojaSelect2');
+        
+        [sel1, sel2].forEach(sel => {
+          sel.innerHTML = '';
+          r.poojas.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.name;
+            opt.textContent = p.name + ' (₹' + p.price + ')';
+            sel.appendChild(opt);
+          });
+        });
+        
+        if (r.poojas.length) {
+          sel1.value = r.poojas[0].name;
+          updateTotalAmount();
+        }
+      }
+    }
+
+    // Calculate total amount from selected poojas
+    function updateTotalAmount() {
+      let total = 0;
+      const pooja1 = poojaList.find(p => p.name === document.getElementById('poojaSelect1').value);
+      if (pooja1) total += pooja1.price;
+      
+      if (document.getElementById('pooja2Row').style.display !== 'none') {
+        const pooja2 = poojaList.find(p => p.name === document.getElementById('poojaSelect2').value);
+        if (pooja2) total += pooja2.price;
+      }
+      
+      document.getElementById('amount').value = total;
+    }
+
+    // Load poojas when the document is ready
+    window.addEventListener('DOMContentLoaded', () => {
+      loadPoojas();
+      
+      // Add event listeners for pooja selection changes
+      document.getElementById('poojaSelect1').addEventListener('change', updateTotalAmount);
+      document.getElementById('poojaSelect2').addEventListener('change', updateTotalAmount);
+      
+      // Add Pooja button handler
+      document.getElementById('addPoojaBtn').addEventListener('click', () => {
+        document.getElementById('pooja2Row').style.display = 'flex';
+        document.getElementById('addPoojaBtn').style.display = 'none';
+        updateTotalAmount();
+      });
+      
+      // Remove Pooja button handler
+      document.getElementById('removePooja2').addEventListener('click', () => {
+        document.getElementById('pooja2Row').style.display = 'none';
+        document.getElementById('addPoojaBtn').style.display = 'block';
+        document.getElementById('poojaSelect2').value = poojaList[0].name;
+        updateTotalAmount();
+      });
+    });
+    // Save & Print
+    document.getElementById('receiptForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {};
+      
+      // Combine poojas if both are selected
+      const pooja1 = formData.get('pooja1');
+      const pooja2 = document.getElementById('pooja2Row').style.display !== 'none' ? formData.get('pooja2') : null;
+      
+      data.pooja_name = pooja2 ? `${pooja1}, ${pooja2}` : pooja1;
+      data.devotee_name = formData.get('devotee_name');
+      data.address = formData.get('address');
+      data.amount = formData.get('amount');
+      data.payment_mode = formData.get('payment_mode');
+      
+      const res = await window.electronAPI.createReceipt(data);
+      document.getElementById('result').textContent = res.success ? 'Receipt saved and ready to print.' : res.error;
+      if (res.success && res.receiptId) {
+        await window.electronAPI.printReceipt(res.receiptId);
+      }
+    };
+    // Clear Form
+    document.getElementById('clearBtn').onclick = () => {
+  document.getElementById('receiptForm').reset();
+  document.getElementById('amount').value = poojaList[0] ? poojaList[0].price : '';
+    };
+    // Preview Receipt
+    document.getElementById('previewBtn').onclick = () => {
+      const data = Object.fromEntries(new FormData(document.getElementById('receiptForm')));
+      // Use the same template as the actual receipt
+      document.getElementById('previewContent').innerHTML = `
+        <div class="page-wrapper" style="width:100%;height:100%;display:flex;align-items:flex-start;justify-content:center;">
+          <div class="receipt-container" style="width:100%;padding:0.3em 1em 1.2cm 1em;display:flex;flex-direction:column;justify-content:space-between;background:white;font-size:1.3em;position:relative;border:1.5px solid #222;border-radius:12px;">
+            <div class="header-row" style="display:flex;justify-content:space-between;align-items:center;padding:0.3em 2em 0.2em 2em;margin-bottom:0.2em;">
+              <div class="circle-img left" style="width:55px;height:55px;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;">
+                <img src="../assets/temple logo.png" alt="Temple Logo" style="width:45px;height:45px;object-fit:contain;">
+              </div>
+              <div class="center-img" style="width:110px;height:55px;display:flex;align-items:center;justify-content:center;background:#fff;">
+                <img src="../assets/symbols.png" alt="Temple Symbol" style="width:100px;height:45px;object-fit:contain;">
+              </div>
+              <div class="circle-img right" style="width:55px;height:55px;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;">
+                <img src="../assets/SET logo.png" alt="SET Logo" style="width:45px;height:45px;object-fit:contain;">
+              </div>
+            </div>
+            <div style="font-size:1.3em;font-weight:600;text-align:center;margin:0.15em 0;font-family:'Noto Sans Kannada',sans-serif;">ಶ್ರೀ ಸೌಂದರ್ಯ ವೆಂಕಟರಮಣ ಸ್ವಾಮಿ ದೇವಸ್ಥಾನ</div>
+            <div style="font-size:1em;text-align:center;margin:0.15em 0 0.25em 0;font-family:'Noto Sans Kannada',sans-serif;line-height:1.2;">೧೨ನೇ ಅಡ್ಡ ರಸ್ತೆ, ೧ನೇ ಮುಖ್ಯ ರಸ್ತೆ, ಸೌಂದರ್ಯ ನಗರ, ಸಿಡೆದಹಳ್ಳಿ,<br>ನಾಗಸಂದ್ರ ಅಂಚೆ, ಬೆಂಗಳೂರು</div>
+            <div class="main-section" style="flex:1;margin:0.3em 0 0.3em;padding:0;display:flex;align-items:stretch;">
+              <table style="width:100%;border-collapse:separate;border-spacing:0;border:2px solid #222;border-radius:4px;">
+                <tr>
+                  <td style="width:60%;border-right:2px solid #222;padding:0.6em 0.8em;">
+                    <table style="width:100%;">
+                      <tr><td style="width:38%;font-weight:500;padding:0.2em;">ರಸೀದಿ ಸಂಖ್ಯೆ:</td><td style="border-bottom:1.5px dotted #222;">(Generated when printed)</td></tr>
+                      <tr><td style="width:38%;font-weight:500;padding:0.2em;">ದಿನಾಂಕ:</td><td style="border-bottom:1.5px dotted #222;">${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('-').join('/')}</td></tr>
+                      <tr><td style="width:38%;font-weight:500;padding:0.2em;">ಹೆಸರು:</td><td style="border-bottom:1.5px dotted #222;">${data.devotee_name || ''}</td></tr>
+                      <tr><td style="width:38%;font-weight:500;padding:0.2em;">ವಿಳಾಸ:</td><td style="border-bottom:1.5px dotted #222;">${data.address || ''}</td></tr>
+                      <tr><td style="width:38%;font-weight:500;padding:0.2em;">ಪೂಜೆ/ಸೇವೆ:</td><td style="border-bottom:1.5px dotted #222;">${data.pooja_name || ''}</td></tr>
+                      <tr><td style="width:38%;font-weight:500;padding:0.2em;">ಪಾವತಿ ವಿಧಾನ:</td><td style="border-bottom:1.5px dotted #222;">${data.payment_mode || ''}</td></tr>
+                    </table>
+                  </td>
+                  <td style="width:40%;padding:0.6em 0.8em;">
+                    <table style="width:100%;height:100%;">
+                      <tr><td style="text-align:center;padding:0.4em;font-family:'NotoSansKannada','Tunga','Nirmala UI',system-ui;"><strong>ಮೊತ್ತ</strong></td></tr>
+                      <tr><td style="text-align:center;font-size:1.8em;font-weight:bold;padding:0.25em 0;border-bottom:1.5px dotted #222;font-family:'NotoSansKannada','Tunga','Nirmala UI',system-ui;">₹ ${data.amount || ''}</td></tr>
+                      <tr><td style="text-align:center;font-size:1.1em;color:#333;padding:0.25em 0;border-bottom:1.5px dotted #222;font-family:'NotoSansKannada','Tunga','Nirmala UI',system-ui;">${amountInWords(data.amount)}</td></tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div style="font-size:0.9em;font-weight:700;text-align:center;width:100%;font-family:'Noto Sans Kannada',sans-serif;line-height:1;margin:0;padding:0 0.2em;position:absolute;bottom:0.15cm;left:0;right:0;">ನಿಮ್ಮ ಜೀವನದಲ್ಲಿ ಶ್ರೀ ಸೌಂದರ್ಯ ವೆಂಕಟರಮಣ ಸ್ವಾಮಿಯ ಆಶೀರ್ವಾದ ಸದಾ ಇರಲಿ.</div>
+          </div>
+        </div>
+      `;
+      document.getElementById('previewModal').style.display = 'flex';
+    };
+    // Handle both close and back buttons for preview modal
+    function closePreviewModal() {
+      document.getElementById('previewModal').style.display = 'none';
+    }
+    document.getElementById('closePreview').onclick = closePreviewModal;
+    document.getElementById('backFromPreview').onclick = closePreviewModal;
+  </script>
+</body>
+</html>

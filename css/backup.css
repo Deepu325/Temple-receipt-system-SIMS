@@ -1,0 +1,85 @@
+/* Backup page styles */
+.card-form {
+  background: #fff;
+  max-width: 420px;
+  margin: 2em auto 2em auto;
+  padding: 2em 2.5em 1.5em 2.5em;
+  border-radius: 16px;
+  box-shadow: 0 4px 32px #0002;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+}
+
+.card-form label {
+  font-weight: 500;
+  margin-right: 0.5em;
+}
+
+.card-form input[type="date"] {
+  padding: 0.4em 0.8em;
+  border: 1px solid #bfc7d1;
+  border-radius: 6px;
+  font-size: 1em;
+  background: #f8fafc;
+  transition: border 0.2s, box-shadow 0.2s;
+  margin: 0 0.5em 0 0.2em;
+}
+.card-form input[type="date"]:focus {
+  border: 1.5px solid #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 2px #3b82f633;
+}
+    margin-bottom: 20px;
+    font-size: 1.5em; /* Increased font size */
+    border: 2px solid #333; /* Added border */
+  accent-color: #3b82f8;
+  margin-right: 0.3em;
+}
+
+.form-actions {
+  display: flex;
+    font-size: 1.5em; /* Increased font size */
+  justify-content: center;
+}
+
+.card-form button[type="submit"] {
+  background: linear-gradient(90deg, #3b82f6 60%, #2563eb 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6em 1.6em;
+  font-size: 1.05em;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #3b82f622;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+.card-form button[type="submit"]:hover, .card-form button[type="submit"]:focus {
+  background: linear-gradient(90deg, #2563eb 60%, #1d4ed8 100%);
+  box-shadow: 0 4px 16px #2563eb33;
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* Add styles for backup table */
+.table-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  font-size: 1.2em;
+}
+
+.backup-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 1.5em; /* Increased font size */
+  border: 2px solid #333; /* Added border */
+}
+
+.backup-table th, .backup-table td {
+  border: 1px solid #333;
+  padding: 10px;
+  text-align: left;
+  font-size: 1.5em; /* Increased font size */
+}

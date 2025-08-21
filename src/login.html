@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Temple App</title>
+  <link rel="stylesheet" href="../css/header.css">
+  <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+  <div class="header">
+    <img src="../assets/temple logo.png" alt="Temple Logo" class="logo">
+    <h1 class="kannada">ಶ್ರೀ ಸೌಂದರ್ಯ ವೆಂಕಟರಮಣ ಸ್ವಾಮಿ ದೇವಸ್ಥಾನ</h1>
+  </div>
+  <div class="card-form" style="margin-top: 2em; min-width:320px;">
+    <h2 style="text-align:center; margin-bottom:1em;">Login</h2>
+    <form id="loginForm" autocomplete="off" style="display:flex; flex-direction:column; gap:1.2em;">
+      <div style="display:flex; flex-direction:column; gap:0.5em;">
+        <label for="username">Username</label>
+        <input id="username" name="username" required autofocus style="font-size:1.1em; padding:0.5em; border-radius:6px; border:1px solid #bbb;">
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.5em; position:relative;">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required style="font-size:1.1em; padding:0.5em 2.5em 0.5em 0.5em; border-radius:6px; border:1px solid #bbb;">
+        <span id="togglePwd" style="position:absolute; right:0.7em; top:2.3em; cursor:pointer; user-select:none; display:flex; align-items:center;">
+          <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye" style="display:inline;"><circle cx="12" cy="12" r="3"/><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/></svg>
+          <svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off" style="display:none;"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.81 21.81 0 0 1 5.06-6.06"/><path d="M1 1l22 22"/><path d="M9.53 9.53A3.001 3.001 0 0 0 12 15a3 3 0 0 0 2.47-5.47"/></svg>
+        </span>
+      </div>
+      <div class="form-actions" style="justify-content:center;">
+        <button type="submit" style="font-size:1.1em; padding:0.5em 2em; border-radius:6px; background:#1976d2; color:#fff; border:none;">Login</button>
+      </div>
+      <div class="error" id="loginError"></div>
+    </form>
+  </div>
+  <script>
+    // Password eye toggle with SVG
+    const pwd = document.getElementById('password');
+    const toggle = document.getElementById('togglePwd');
+    const eyeOpen = document.getElementById('eyeOpen');
+    const eyeClosed = document.getElementById('eyeClosed');
+    toggle.onclick = () => {
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        eyeOpen.style.display = 'none';
+        eyeClosed.style.display = 'inline';
+      } else {
+        pwd.type = 'password';
+        eyeOpen.style.display = 'inline';
+        eyeClosed.style.display = 'none';
+      }
+    };
+  </script>
+  <script src="../js/login.js"></script>
+</body>
+</html>

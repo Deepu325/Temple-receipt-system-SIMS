@@ -1,0 +1,115 @@
+/* Filter button modern design */
+.filter-form button[type="submit"] {
+  background: #0078d7;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7em 1.6em;
+  font-size: 1.08em;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  box-shadow: 0 2px 8px #0078d71a;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.filter-form button[type="submit"]:hover {
+  background: #005fa3;
+  box-shadow: 0 4px 16px #0078d733;
+}
+body {
+  background: #f7f9fa;
+}
+.dashboard-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  margin-top: 2em;
+}
+.card-grid {
+  display: flex;
+  flex-direction: row;
+  gap: 2.5em;
+  justify-content: center;
+  margin-bottom: 2.5em;
+}
+.dashboard-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px #0078d71a;
+  padding: 2.2em 2.7em 1.7em 2.7em;
+  min-width: 200px;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+  gap: 0.7em;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.dashboard-card:hover {
+  box-shadow: 0 8px 32px #0078d733;
+  transform: translateY(-4px) scale(1.03);
+}
+.dashboard-card img {
+  height: 38px;
+  margin-bottom: 0.7em;
+}
+.dashboard-card .label {
+  font-size: 1.1em;
+  color: #555;
+}
+.dashboard-card .value {
+  font-size: 2.2em;
+  font-weight: bold;
+  color: #0078d7;
+}
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2em;
+}
+.filter-form {
+  max-width: 500px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px #0001;
+  padding: 1.5em 2em;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+}
+.filter-fields {
+  display: flex;
+  gap: 1.5em;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.filter-fields label {
+  font-weight: 500;
+  margin-bottom: 0.2em;
+}
+.filter-fields input {
+  width: 140px;
+  padding: 0.7em;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  font-size: 1em;
+  background: #f7f9fa;
+  transition: border 0.2s;
+}
+.filter-fields input:focus {
+  border: 1.5px solid #0078d7;
+  outline: none;
+}
+@media (max-width: 900px) {
+  .card-grid { flex-direction: column; gap: 1.2em; align-items: center; }
+  .dashboard-card { min-width: 90vw; }
+  .filter-fields { flex-direction: column; gap: 1em; }
+}

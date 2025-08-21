@@ -1,0 +1,295 @@
+thead {
+th, td {
+tbody tr:nth-child(even) {
+
+@font-face {
+  font-family: 'Noto Sans Kannada';
+  src: url('../assets/NotoSansKannada-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --primary: #0078d7;
+  html, body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f7f9fa;
+    color: #222;
+    min-height: 100vh;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5em;
+    margin-top: 2.5em;
+    margin-bottom: 1.2em;
+  }
+  .logo {
+    height: 56px;
+    width: 56px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px #0002);
+  }
+  .kannada {
+    font-family: 'Noto Sans Kannada', 'Noto Sans', sans-serif;
+    font-size: 2.5rem;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    color: #222;
+    text-shadow: 0 2px 8px #0001;
+  }
+  .nav {
+    display: flex;
+    justify-content: center;
+    gap: 2em;
+    margin-bottom: 2.5em;
+    background: #fff;
+    box-shadow: 0 2px 12px #0001;
+    padding: 0.7em 0;
+    border-radius: 8px;
+  }
+  .nav a {
+    color: #0078d7;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.13em;
+    padding: 0.4em 1.1em;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .nav a.active, .nav a:hover {
+    background: #e6f0fa;
+    color: #005fa3;
+  }
+  .card-form {
+    background: #fff;
+    max-width: 480px;
+    margin: 2.5em auto 2em auto;
+    padding: 2.2em 2.7em 1.7em 2.7em;
+    border-radius: 14px;
+    box-shadow: 0 4px 24px #0002;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+  }
+  .card-form label {
+    font-weight: 500;
+    margin-bottom: 0.2em;
+  }
+  .card-form input, .card-form select {
+    width: 100%;
+    padding: 0.8em;
+    border-radius: 7px;
+    border: 1px solid #bbb;
+    font-size: 1.08em;
+    margin-bottom: 1.1em;
+    background: #f7f9fa;
+    transition: border 0.2s;
+  }
+  .card-form input:focus, .card-form select:focus {
+    border: 1.5px solid #0078d7;
+    outline: none;
+  }
+  .form-actions {
+    display: flex;
+    gap: 1.2em;
+    justify-content: flex-end;
+  }
+  button, .card-form button, .table-actions button {
+    background: #0078d7;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.7em 1.4em;
+    font-size: 1.08em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px #0078d71a;
+  }
+  button.secondary, .card-form button.secondary, .table-actions button.secondary {
+    background: #e6f0fa;
+    color: #0078d7;
+    border: 1px solid #b3d6f5;
+    box-shadow: none;
+  }
+  button:hover, .card-form button:hover, .table-actions button:hover {
+    background: #005fa3;
+    color: #fff;
+  }
+  .table-responsive {
+    overflow-x: auto;
+    margin: 2.5em auto;
+    max-width: 1100px;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 900px;
+    background: #fff;
+    box-shadow: 0 2px 16px #0001;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  th, td {
+    padding: 1em 1.2em;
+    text-align: left;
+    font-size: 1.05em;
+  }
+  th {
+    background: #f7f9fa;
+    font-weight: 600;
+    font-size: 1.12em;
+  }
+  tr:nth-child(even) {
+    background: #f3f6fa;
+  }
+  .table-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2em 0 1em 0;
+    flex-wrap: wrap;
+    gap: 1.2em;
+  }
+  .pooja-list {
+    list-style: none;
+    padding: 0;
+    margin: 2.5em auto 0 auto;
+    max-width: 480px;
+  }
+  .pooja-list li {
+    background: #f7f9fa;
+    margin-bottom: 0.9em;
+    padding: 1.1em 1.4em;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px #0001;
+  }
+  .pooja-list button {
+    margin-left: 0.7em;
+  }
+  .modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #0008;
+    z-index: 1000;
+  }
+  .modal-content {
+    background: #fff;
+    padding: 2.2em 2.2em 1.2em 2.2em;
+    border-radius: 12px;
+    max-width: 420px;
+    min-width: 320px;
+    position: relative;
+    box-shadow: 0 2px 16px #0002;
+  }
+  .close {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    background: none;
+    border: none;
+    font-size: 1.7em;
+    color: #888;
+    cursor: pointer;
+  }
+  .error {
+    color: #b00;
+    margin-top: 1em;
+    font-size: 1em;
+  }
+  @media (max-width: 900px) {
+    .header { flex-direction: column; gap: 0.7em; }
+    .kannada { font-size: 1.5rem; }
+    .card-form, .pooja-list { max-width: 98vw; padding: 1em; }
+    .table-responsive { max-width: 98vw; }
+    table { min-width: 500px; }
+  }
+  @media (max-width: 600px) {
+    .header { margin-top: 1em; }
+    .nav { flex-direction: column; gap: 0.5em; padding: 0.5em 0; }
+    .card-form, .pooja-list { padding: 0.7em; }
+    th, td { padding: 0.5em 0.5em; }
+  }
+  padding: 0.3em 0.7em;
+  font-size: 0.95em;
+  margin-right: 0.3em;
+}
+
+/* Kannada text utility */
+.kannada {
+  font-family: var(--font-kannada);
+  font-size: 1.1em;
+  line-height: 1.5;
+  letter-spacing: 0.5px;
+}
+
+/* Role-based hiding */
+.hide-for-staff {
+  display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  main {
+    padding: 1.2em 0.5em;
+  }
+  th, td {
+    font-size: 0.97em;
+    padding: 0.5em 0.3em;
+  }
+  .header h1 {
+    font-size: 1.3em;
+  }
+}
+@media (max-width: 700px) {
+  main {
+    padding: 0.5em 0.1em;
+  }
+  .header h1 {
+    font-size: 1em;
+  }
+  .nav {
+    gap: 0.5em;
+  }
+  .card-form {
+    padding: 1em 0.5em;
+  }
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  thead {
+    display: none;
+  }
+  tr {
+    margin-bottom: 1em;
+    border-bottom: 2px solid var(--border);
+  }
+  td {
+    border: none;
+    position: relative;
+    padding-left: 50%;
+    min-height: 2em;
+    font-size: 0.98em;
+  }
+  td:before {
+    position: absolute;
+    left: 0.5em;
+    top: 0.5em;
+    width: 45%;
+    white-space: nowrap;
+    font-weight: bold;
+    color: #555;
+    content: attr(data-label);
+  }
+}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backup Receipts</title>
+  <link href="../assets/NotoSansKannada-Regular.ttf" rel="preload" as="font" type="font/ttf" crossorigin>
+  <style>
+    @font-face {
+      font-family: 'Noto Sans Kannada';
+      src: url('../assets/NotoSansKannada-Regular.ttf') format('truetype');
+      font-display: swap;
+    }
+  </style>
+  <link rel="stylesheet" href="../css/header.css">
+  <link rel="stylesheet" href="../css/backup.css">
+  <link rel="stylesheet" href="../css/backup-print.css" media="print">
+</head>
+<body>
+  <div class="header">
+    <img src="../assets/temple logo.png" alt="Temple Logo" class="logo">
+    <h1 class="kannada">ಶ್ರೀ ಸೌಂದರ್ಯ ವೆಂಕಟರಮಣ ಸ್ವಾಮಿ ದೇವಸ್ಥಾನ</h1>
+  </div>
+  <nav class="nav" id="mainNav"></nav>
+  <main>
+    <section class="backup-section">
+      <h2 style="text-align:center;margin-bottom:1.5em;">Backup Receipts</h2>
+      <div style="display:flex;justify-content:center;align-items:center;min-height:300px;">
+        <form id="backupForm" class="card-form" style="min-width:340px;max-width:420px;width:100%;">
+          <div class="filter-fields" style="justify-content:center;gap:2em;">
+            <label><input type="radio" name="mode" value="all" checked> All</label>
+            <label><input type="radio" name="mode" value="range"> Date Range</label>
+          </div>
+          <div class="filter-fields" style="justify-content:center;gap:1em;">
+            <label for="from">From</label>
+            <input name="from" id="from" type="date">
+            <label for="to">To</label>
+            <input name="to" id="to" type="date">
+          </div>
+          <div class="form-actions" style="justify-content:center;">
+            <button type="submit">Generate Backup PDF</button>
+          </div>
+          <div id="result" style="margin-top:1em;text-align:center;"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+  <script>
+    // Role-based nav and access control
+    const role = localStorage.getItem('role');
+    if (!role) {
+      window.location.replace('login.html');
+    }
+    const nav = document.getElementById('mainNav');
+    if (nav) {
+      let links = [
+        { href: 'index.html', label: 'Home' },
+        { href: 'create-receipt.html', label: 'Create Receipt' },
+        { href: 'manage-poojas.html', label: 'Manage Poojas' },
+        { href: 'receipt-history.html', label: 'Receipt History' },
+        { href: 'backup.html', label: 'Backup' }
+      ];
+      if (role === 'staff') {
+        links = links.filter(l => l.href === 'index.html' || l.href === 'create-receipt.html' || l.href === 'receipt-history.html');
+      }
+      links.push({ href: '#', label: 'Logout', id: 'logoutLink' });
+      nav.innerHTML = links.map(l => `<a href="${l.href}"${l.id ? ` id="${l.id}"` : ''}>${l.label}</a>`).join('');
+      // Logout handler
+      const logout = document.getElementById('logoutLink');
+      if (logout) {
+        logout.onclick = (e) => {
+          e.preventDefault();
+          localStorage.clear();
+          window.location.replace('login.html');
+        };
+      }
+      // Highlight active nav link
+      const navLinks = nav.querySelectorAll('a');
+      navLinks.forEach(link => {
+        if (location.pathname.endsWith(link.getAttribute('href'))) {
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
+        }
+      });
+    }
+    // Hide action buttons for staff
+    window.addEventListener('DOMContentLoaded', () => {
+      if (role === 'staff') {
+        // Hide manage-poojas and backup buttons
+        const manageBtn = document.querySelector('a[href="manage-poojas.html"]');
+        if (manageBtn) manageBtn.style.display = 'none';
+        const backupBtn = document.querySelector('a[href="backup.html"]');
+        if (backupBtn) backupBtn.style.display = 'none';
+      }
+    });
+    // Backup form submit
+    document.getElementById('backupForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      let filters = {};
+      if (data.mode === 'range') {
+        if (data.from) filters.from = data.from;
+        if (data.to) filters.to = data.to;
+      }
+      const res = await window.electronAPI.generateBackupPDF(filters);
+      document.getElementById('result').textContent = res.success ? 'Backup PDF: ' + res.pdfPath : res.error;
+    };
+  </script>
+</body>
+<!-- ...existing code... -->

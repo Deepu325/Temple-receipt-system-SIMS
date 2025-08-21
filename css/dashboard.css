@@ -1,0 +1,77 @@
+.date-filter {
+  text-align: center;
+  margin-bottom: 2em;
+  padding: 1em;
+}
+
+.filter-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1.2em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: inline-block;
+  min-width: 600px;
+}
+
+.quick-filters {
+  margin-bottom: 1em;
+  display: flex;
+  justify-content: center;
+  gap: 0.8em;
+}
+
+.filter-btn {
+  padding: 0.5em 1em;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 6px;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #4b5563;
+}
+
+.filter-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.filter-btn.active {
+  background: #3b82f6;
+  border-color: #2563eb;
+  color: white;
+}
+
+.date-input-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+}
+
+.date-input-group label {
+  font-size: 0.95em;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.date-filter input[type="date"] {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.95em;
+  background: #f8fafc;
+  transition: all 0.2s;
+  color: #1f2937;
+}
+
+.date-filter input[type="date"]:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 2px #3b82f633;
+  background: white;
+}
+
+.date-filter input[type="date"]:hover {
+  border-color: #cbd5e1;
+}

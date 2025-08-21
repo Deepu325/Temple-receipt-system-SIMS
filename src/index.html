@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=800, initial-scale=1.0">
+  <title>Electron Offline App</title>
+  <link rel="stylesheet" href="../css/header.css">
+  <link rel="stylesheet" href="../css/index.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <div class="header">
+    <img src="../assets/temple logo.png" alt="Temple Logo" class="logo">
+    <h1 class="kannada">ಶ್ರೀ ಸೌಂದರ್ಯ ವೆಂಕಟರಮಣ ಸ್ವಾಮಿ ದೇವಸ್ಥಾನ</h1>
+  </div>
+    <nav class="nav" id="mainNav"></nav>
+  <main>
+  <script>
+    // Role-based nav and access control
+    const role = localStorage.getItem('role');
+    if (!role) {
+      window.location.replace('login.html');
+    }
+    const nav = document.getElementById('mainNav');
+    if (nav) {
+      let links = [
+        { href: 'index.html', label: 'Home' },
+        { href: 'create-receipt.html', label: 'Create Receipt' },
+        { href: 'manage-poojas.html', label: 'Manage Poojas' },
+        { href: 'receipt-history.html', label: 'Receipt History' },
+        { href: 'backup.html', label: 'Backup' }
+      ];
+      if (role === 'staff') {
+        links = links.filter(l => l.href === 'index.html' || l.href === 'create-receipt.html' || l.href === 'receipt-history.html');
+      }
+  links.push({ href: '#', label: 'Logout', id: 'logoutLink' });
+  nav.innerHTML = links.map(l => `<a href="${l.href}"${l.id ? ` id="${l.id}"` : ''}>${l.label}</a>`).join('');
+      // Logout handler
+      const logout = document.getElementById('logoutLink');
+      if (logout) {
+        logout.onclick = (e) => {
+          e.preventDefault();
+          localStorage.clear();
+          window.location.replace('login.html');
+        };
+      }
+      // Highlight active nav link
+      const navLinks = nav.querySelectorAll('a');
+      navLinks.forEach(link => {
+        if (location.pathname.endsWith(link.getAttribute('href'))) {
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
+        }
+      });
+    }
+    // Hide action buttons for staff
+    window.addEventListener('DOMContentLoaded', () => {
+      if (role === 'staff') {
+        // Hide manage-poojas and backup buttons
+        const manageBtn = document.querySelector('a[href="manage-poojas.html"]');
+        if (manageBtn) manageBtn.style.display = 'none';
+        const backupBtn = document.querySelector('a[href="backup.html"]');
+        if (backupBtn) backupBtn.style.display = 'none';
+      }
+    });
+  </script>
+    <section class="dashboard-section">
+      <div class="date-filter">
+        <div class="filter-container">
+          <div class="quick-filters">
+            <button class="filter-btn" data-filter="today">Today</button>
+            <button class="filter-btn" data-filter="yesterday">Yesterday</button>
+            <button class="filter-btn" data-filter="week">Last 7 Days</button>
+            <button class="filter-btn" data-filter="month">Last 30 Days</button>
+          </div>
+          <div class="date-input-group">
+            <label for="statsDate">Select Date:</label>
+            <input type="date" id="statsDate" name="statsDate">
+          </div>
+        </div>
+      </div>
+      <div class="card-grid">
+        <div class="card dashboard-card">
+          <img src="../assets/pooja icon.svg" alt="Poojas">
+          <div class="value" id="stat-poojas">0</div>
+          <div class="label">Available Poojas</div>
+        </div>
+        <div class="card dashboard-card">
+          <img src="../assets/recipt icon.svg" alt="Receipts">
+          <div class="value" id="stat-receipts">0</div>
+          <div class="label">Today's Receipts</div>
+        </div>
+        <div class="card dashboard-card">
+          <img src="../assets/total icon.svg" alt="Amount">
+          <div class="value" id="stat-amount">₹0</div>
+          <div class="label">Today's Amount</div>
+        </div>
+      </div>
+    </section>
+  <!-- Filter section removed: filtering is available in the history page only. -->
+  <!-- Navigation is now handled by the nav bar above. -->
+  </main>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+</html>
