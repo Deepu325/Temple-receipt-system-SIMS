@@ -1,6 +1,6 @@
 {
   "name": "electron-offline-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Electron.js offline desktop app skeleton",
   "main": "main.js",
   "scripts": {

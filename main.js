@@ -141,7 +141,7 @@ function createWindow() {
     dialog.showMessageBox({
       type: 'info',
       title: 'Update Available',
-      message: `Version ${info.version} is available. Would you like to download it now?`,
+      message: `Version ${info.version} is available with improvements. Would you like to download it now?`,
       buttons: ['Yes', 'No']
     }).then((result) => {
       if (result.response === 0) {
