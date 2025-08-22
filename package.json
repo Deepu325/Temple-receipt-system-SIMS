@@ -71,6 +71,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^12.2.0",
+    "electron-log": "^5.4.3",
     "pdfkit": "^0.17.1",
     "puppeteer": "^24.16.2"
   }

@@ -3,6 +3,7 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
 const db = require('better-sqlite3')(path.join(__dirname, 'db/temple.db'));
 
 // Configure auto-updater
