@@ -4,10 +4,35 @@ const fs = require('fs');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
+
+// Configure electron-log
+log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs/main.log');
+log.transports.file.level = 'info';
 const SyncManager = require('./js/sync-manager');
 
 let syncManager = null;
 let mainWindow = null;
+let db = null;
+
+// Initialize database at startup
+function initDb() {
+    if (!db) {
+        const dbPath = path.join(app.getPath('userData'), 'temple.db');
+        db = require('better-sqlite3')(dbPath);
+        
+        // Apply migrations if needed
+        try {
+            const migrationPath = path.join(__dirname, 'db', 'migrations', 'sync-schema.sql');
+            if (fs.existsSync(migrationPath)) {
+                const migration = fs.readFileSync(migrationPath, 'utf8');
+                db.exec(migration);
+            }
+        } catch (error) {
+            log.error('Migration error:', error);
+        }
+    }
+    return db;
+}
 
 // Initialize database with the correct schema
 function initializeDatabase() {
@@ -47,9 +72,15 @@ function getTextLengthAttribute(text) {
 }
 
 function printReceipt(receiptId) {
-  // 1. Fetch receipt data
-  const receipt = db.prepare('SELECT * FROM receipts WHERE id = ?').get(receiptId);
-  if (!receipt) return;
+  try {
+    // 1. Fetch receipt data
+    const database = initDb();
+    const receipt = database.prepare('SELECT * FROM receipts WHERE id = ?').get(receiptId);
+    
+    if (!receipt) {
+      log.error('Receipt not found:', receiptId);
+      return { success: false, error: 'Receipt not found' };
+    }
   
   // Get base64 encoded fonts
   const regularFont = embedFont('NotoSansKannada-Regular.ttf');
@@ -123,8 +154,25 @@ function printReceipt(receiptId) {
       silent: false, 
       printBackground: true, 
       pageSize: 'A5',
-      landscape: true
+      landscape: true,
+      margins: {
+        marginType: 'custom',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
+      }
     }, (success, errorType) => {
+      if (!success) {
+        log.error('Print failed:', errorType);
+        dialog.showErrorBox('Print Error', 'Failed to print receipt. Please try again.');
+      }
+      try {
+        // Clean up temp file
+        fs.unlinkSync(tmpFile);
+      } catch (e) {
+        log.error('Failed to clean up temp file:', e);
+      }
       printWin.close();
     });
   });
@@ -259,8 +307,24 @@ function registerIpcHandlers() {
 }
 
 app.whenReady().then(() => {
-  createWindow();
-  registerIpcHandlers();
+  try {
+    // Initialize database first
+    db = initDb();
+    if (!db) {
+      dialog.showErrorBox('Database Error', 'Failed to initialize database. The application will now quit.');
+      app.quit();
+      return;
+    }
+    
+    createWindow();
+    registerIpcHandlers();
+    
+    log.info('Application started successfully');
+  } catch (error) {
+    log.error('Application startup error:', error);
+    dialog.showErrorBox('Startup Error', 'Failed to start application: ' + error.message);
+    app.quit();
+  }
 });
 
 app.on('window-all-closed', () => {
