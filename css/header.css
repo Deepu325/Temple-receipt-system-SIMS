@@ -55,3 +55,28 @@
 @media (max-width: 600px) {
   .header { margin-top: 1em; }
 }
+
+/* Settings specific styles */
+.settings-nav {
+  margin-left: auto;
+}
+
+.settings-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+/* User management specific styles */
+.user-nav {
+  margin-right: auto;
+}
+
+.role-badge {
+  font-size: 0.8em;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #e6f0fa;
+  color: #005fa3;
+  margin-left: 8px;
+}

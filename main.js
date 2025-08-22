@@ -4,7 +4,23 @@ const fs = require('fs');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
-const db = require('better-sqlite3')(path.join(__dirname, 'db/temple.db'));
+const SyncManager = require('./js/sync-manager');
+
+let syncManager = null;
+let mainWindow = null;
+
+// Initialize database with the correct schema
+function initializeDatabase() {
+    const dbPath = path.join(app.getPath('userData'), 'temple.db');
+    const db = require('better-sqlite3')(dbPath);
+    
+    // Apply migrations
+    const migrationPath = path.join(__dirname, 'db', 'migrations', 'sync-schema.sql');
+    const migration = fs.readFileSync(migrationPath, 'utf8');
+    db.exec(migration);
+    
+    return db;
+}
 
 // Configure auto-updater
 autoUpdater.logger = require('electron-log');

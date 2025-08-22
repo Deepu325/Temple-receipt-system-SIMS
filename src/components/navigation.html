@@ -1,0 +1,34 @@
+<!-- Admin Navigation -->
+<nav class="nav admin-nav">
+    <a href="create-receipt.html">Create Receipt</a>
+    <a href="receipt-history.html">Receipt History</a>
+    <a href="manage-poojas.html">Manage Poojas</a>
+    <a href="backup.html">Backup</a>
+    <a href="user-management.html">User Management</a>
+    <a href="settings.html">Settings</a>
+    <a href="login.html" onclick="logout()">Logout</a>
+</nav>
+
+<!-- Staff Navigation -->
+<nav class="nav staff-nav" style="display: none;">
+    <a href="create-receipt.html">Create Receipt</a>
+    <a href="receipt-history.html">Receipt History</a>
+    <a href="login.html" onclick="logout()">Logout</a>
+</nav>
+
+<script>
+    // Show/hide appropriate navigation based on role
+    function updateNavigation() {
+        const userRole = localStorage.getItem('userRole');
+        document.querySelector('.admin-nav').style.display = userRole === 'ADMIN' ? 'flex' : 'none';
+        document.querySelector('.staff-nav').style.display = userRole === 'STAFF' ? 'flex' : 'none';
+    }
+
+    function logout() {
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userId');
+    }
+
+    // Update navigation when page loads
+    updateNavigation();
+</script>

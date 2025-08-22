@@ -1,0 +1,13 @@
+-- Add users table
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    role TEXT NOT NULL, -- 'ADMIN' or 'STAFF'
+    is_active INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    sync_id TEXT UNIQUE,
+    is_synced INTEGER DEFAULT 0,
+    sync_version INTEGER DEFAULT 1
+);

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SIMS TRS - Role Selection</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .role-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            gap: 20px;
+        }
+        .role-button {
+            width: 200px;
+            height: 60px;
+            font-size: 1.2em;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="role-container">
+        <h1>Select System Role</h1>
+        <button id="adminBtn" class="role-button">Admin System</button>
+        <button id="staffBtn" class="role-button">Staff System</button>
+    </div>
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        document.getElementById('adminBtn').addEventListener('click', () => {
+            ipcRenderer.invoke('set-role', 'ADMIN');
+        });
+
+        document.getElementById('staffBtn').addEventListener('click', () => {
+            ipcRenderer.invoke('set-role', 'STAFF');
+        });
+    </script>
+</body>
+</html>

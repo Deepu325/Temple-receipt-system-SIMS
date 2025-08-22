@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Management - SIMS TRS</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .user-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .user-form {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .user-list {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .status-indicator {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+        .status-online {
+            background: #e6ffe6;
+            color: #006600;
+        }
+        .status-offline {
+            background: #ffe6e6;
+            color: #660000;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-container">
+        <h1>User Management</h1>
+        <div id="connection-status" class="status-indicator"></div>
+
+        <div class="user-form">
+            <h2>Add/Edit User</h2>
+            <form id="userForm">
+                <input type="hidden" id="userId">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role:</label>
+                    <select id="role" required>
+                        <option value="STAFF">Staff</option>
+                        <option value="ADMIN">Admin</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn-primary">Save User</button>
+                    <button type="button" class="btn-secondary" onclick="clearForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="user-list">
+            <h2>User List</h2>
+            <div id="userList"></div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        let editingUser = null;
+
+        // Check online status
+        function updateConnectionStatus() {
+            ipcRenderer.invoke('check-online').then(isOnline => {
+                const status = document.getElementById('connection-status');
+                if (isOnline) {
+                    status.textContent = 'Online';
+                    status.className = 'status-indicator status-online';
+                } else {
+                    status.textContent = 'Offline';
+                    status.className = 'status-indicator status-offline';
+                }
+            });
+        }
+
+        // Load users
+        function loadUsers() {
+            ipcRenderer.invoke('get-users').then(users => {
+                const userList = document.getElementById('userList');
+                userList.innerHTML = users.map(user => `
+                    <div class="user-item">
+                        <div>
+                            <strong>${user.username}</strong> (${user.role})
+                        </div>
+                        <div class="btn-group">
+                            <button onclick="editUser(${user.id})" class="btn-secondary">Edit</button>
+                            <button onclick="deleteUser(${user.id})" class="btn-danger">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        // Form handling
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userData = {
+                id: document.getElementById('userId').value,
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                role: document.getElementById('role').value
+            };
+
+            try {
+                await ipcRenderer.invoke('save-user', userData);
+                clearForm();
+                loadUsers();
+            } catch (error) {
+                alert('Error saving user: ' + error.message);
+            }
+        });
+
+        function editUser(userId) {
+            ipcRenderer.invoke('get-user', userId).then(user => {
+                document.getElementById('userId').value = user.id;
+                document.getElementById('username').value = user.username;
+                document.getElementById('role').value = user.role;
+                document.getElementById('password').value = '';
+                editingUser = user;
+            });
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                ipcRenderer.invoke('delete-user', userId).then(() => {
+                    loadUsers();
+                });
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            editingUser = null;
+        }
+
+        // Initialize
+        updateConnectionStatus();
+        loadUsers();
+        setInterval(updateConnectionStatus, 30000);
+    </script>
+</body>
+</html>
